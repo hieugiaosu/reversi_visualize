@@ -21,10 +21,8 @@ INITIAL_STATE = [[0,0,0,0,0,0,0,0],
 WINDOW_WIDTH = 1000
 WINDOW_HEIGHT = 600
 def main():
-    RANDOM_AGENT_1 = Player(ag.random_agent,"RONALDO",1)
-    RANDOM_AGENT_2 = Player(ag.random_agent,"MESSI",-1)
-    PLAY_BY_YOURSELF1 = Player(ag.move_by_yourself,"YOU",1)
-    PLAY_BY_YOURSELF2 = Player(ag.move_by_yourself,"YOU",-1)
+    RANDOM_AGENT_1 = Player(ag.random_agent,"MESSI",1)
+    RANDOM_AGENT_2 = Player(ag.random_agent,"RONALDO",-1)
     board = Board(INITIAL_STATE)
     player1 = RANDOM_AGENT_1
     player2 = RANDOM_AGENT_2
@@ -145,12 +143,41 @@ class Game:
         self.board = board
     def end_check(self):
         curr_board = self.board.get_board()
-        null=player1=player2 = 0
-        for i in curr_board:
-            if 0 in i: null+=1
-            if 1 in i: player1+=1
-            if -1 in i: player2+=1
-        return null==0 or player1==0 or player2==0
+        # null=player1=player2 = 0
+        # for i in curr_board:
+        #     if 0 in i: null+=1
+        #     if 1 in i: player1+=1
+        #     if -1 in i: player2+=1
+        # return null==0 or player1==0 or player2==0
+        def is_valid_move(board, row, col, turn):
+            if board[row][col] != 0:
+                return False
+            for i in range(-1, 2):
+                for j in range(-1, 2):
+                    if i == 0 and j == 0:
+                        continue
+                    r = row + i 
+                    c = col + j
+                    found_opponent = False
+                    while r >= 0 and r < 8 and c >= 0 and c < 8:
+                        if board[r][c] == 0:
+                            break
+                        if board[r][c] == turn:
+                            if found_opponent:
+                                return True
+                            break
+                        found_opponent = True
+                        r += i
+                        c += j
+            return False
+        def get_valid_moves(board, turn):
+            valid_moves = []
+            for row in range(8):
+                for col in range(8):
+                    if is_valid_move(board, row, col, turn):
+                        valid_moves.append((row, col))
+            return valid_moves
+        return get_valid_moves(curr_board,1)==[] and get_valid_moves(curr_board,-1)==[]
     def win_check(self):
         curr_board = self.board.get_board()
         player1= 0
